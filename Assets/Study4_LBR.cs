@@ -1,0 +1,670 @@
+using Unity.VisualScripting;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using EasyProgressBar;  // Include the namespace for ProgressBar
+
+public class Study4_LBR : BaseS
+{
+    public Vector3 targetHoverPosition = new Vector3(-110.239f, 5f, -107.379f); // Hover position
+    public Vector3 targetLandPosition = new Vector3(-110.239f, 0.43f, -107.379f); // Land position
+    public GameObject Scene;
+
+    // Physics
+    public float hoverDuration = 7.5f; // Duration of hovering
+    public float landMoveDuration = 10.0f; // Duration of landing movement
+    private float acceleration = 1.6f; // Acceleration rate
+
+    private float toggleTimer = 0f; // Timer to track elapsed time
+    private bool isShowHOn = false; // State to track _showH
+
+    private float hoverTimer = 0.0f;
+    private float landMoveStartTime;
+
+    // LEDs reference
+    private GameObject leds;
+    private Material ledMaterial;
+    private float ledToggleTimer = 0f;  // Timer for LED toggle
+    private bool ledsAreOnState = false; // Current state of LEDs
+
+    // Arrow reference
+    private GameObject arrow;
+    private Material arrowMaterial;
+
+    // Progress Bar reference
+    private GameObject wPackage;
+    private GameObject noPackage;
+    private ProgressBar progressBar;  // Reference to the ProgressBar script
+
+    // LandingPad reference
+    private GameObject landingPad;
+    private Material landingPadMaterial;
+
+    // Public Interface input to control which properties to change
+    public int Interface = 1; // 1: Arrow, 2: blinker lights, 3: LandingPad, 4: Both
+
+    // Reference to the DroneControllerLite
+    private DroneControllerLite droneControllerLite;
+
+
+    private void Start()
+    {
+        // Initialize droneControllerLite by finding the Drone object and getting the DroneControllerLite component
+        GameObject droneObject = transform.Find("Drone").gameObject;
+        droneControllerLite = droneObject.GetComponentInChildren<DroneControllerLite>();
+
+        transform.position = new Vector3(-110.239f, 15.0f, -107.379f); // Initial position
+
+        // Corrected hierarchy traversal for Arrow
+        Transform arrowTransform = transform.Find("Drone/1-DISPLAYS/Arrow");
+        if (arrowTransform != null)
+        {
+            arrow = arrowTransform.gameObject;
+            arrowMaterial = arrow.GetComponent<Renderer>().material;
+
+            // Ensure the Arrow is inactive at the start
+            arrow.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("Arrow GameObject not found in the expected hierarchy.");
+        }
+
+        // Find the Wpackage GameObject within the 1-DISPLAYS hierarchy
+        Transform wPackageTransform = transform.Find("Drone/1-DISPLAYS/Wpackage");
+        if (wPackageTransform != null)
+        {
+            wPackage = wPackageTransform.gameObject;
+
+            // Set the Wpackage GameObject inactive at the start
+            wPackage.SetActive(false);
+        }
+
+        // Find the Nopackage GameObject within the 1-DISPLAYS hierarchy
+        Transform noPackageTransform = transform.Find("Drone/1-DISPLAYS/Nopackage");
+        if (noPackageTransform != null)
+        {
+            noPackage = noPackageTransform.gameObject;
+            noPackage.SetActive(false); // Set inactive at start
+        }
+
+         // Find the ProgressBar script attached to the "Image" GameObject
+        Transform progressBarTransform = transform.Find("Drone/1-DISPLAYS/Bar/Image");
+        if (progressBarTransform != null)
+        {
+            progressBar = progressBarTransform.GetComponent<ProgressBar>();
+            if (progressBar != null)
+            {
+                // Example: Set the initial fill amount to 0
+                progressBar.FillAmount = 0f;
+                Debug.Log("ProgressBar FillAmount set to 0.");
+            }
+            else
+            {
+                Debug.LogError("ProgressBar script not found on 'Image' GameObject.");
+            }
+        }
+        else
+        {
+            Debug.LogError("'Image' GameObject not found in the hierarchy.");
+        }
+
+        // Corrected hierarchy traversal for LandingPad
+        Transform landingPadTransform = transform.Find("Drone/3-PROJECTOR/LandingPad");
+        if (landingPadTransform != null)
+        {
+            landingPad = landingPadTransform.gameObject;
+            landingPadMaterial = landingPad.GetComponent<Renderer>().material;
+
+            // Ensure the LandingPad is inactive at the start
+            landingPad.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("LandingPad GameObject not found in the expected hierarchy.");
+        }
+    }
+
+    protected void Update()
+    {
+        switch (currentState)
+        {
+            case DroneState.MoveToInitial:
+                MoveToInitial();
+                arrow.SetActive(false);
+                landingPad.SetActive(false);
+                break;
+            case DroneState.Approach1:
+                Approach1();
+                arrow.SetActive(false);
+                landingPad.SetActive(false);
+                break;
+            case DroneState.Hover1:
+                Hover1();
+                arrow.SetActive(false);
+                landingPad.SetActive(false);
+                break;
+            case DroneState.Approach2:
+                Approach2();
+                arrow.SetActive(false);
+                landingPad.SetActive(false);
+                break;
+            case DroneState.Hover2:
+                Hover2();
+                break;
+            case DroneState.Land:
+                Land();
+                break;
+            case DroneState.Hover3:
+                Hover3();
+                break;
+            case DroneState.Return:
+                Return();
+                break;
+            case DroneState.MoveToFinal:
+                MoveToFinal();
+                break;
+            case DroneState.End:
+                End();
+                break;
+        }
+    }
+
+    private void MoveToInitial()
+    {
+        Vector3 targetPosition = new Vector3(-148.239f, 10.0f, -107.379f);
+
+        droneController.acceleration = acceleration;
+        droneController.SetMaxSpeed(11.10f);
+        droneController.Accelerate(targetPosition - transform.position);
+
+        if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+        {
+            currentState = DroneState.Approach1;
+        }
+
+        // Update LED Blinker settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.isAscending = false;
+            droneControllerLite.isDescending = false;
+        }
+    }
+
+    private void Approach1()
+    {
+        Vector3 targetPosition = new Vector3(-110.239f, 15.0f, -107.379f);
+
+        float remainingDistance = Vector3.Distance(transform.position, targetPosition);
+        droneController.acceleration = acceleration;
+        droneController.SetMaxSpeed(11.1f);
+
+        if (remainingDistance <= 12.3f && remainingDistance > 0.1f)
+        {
+            droneController.Deccelerate(targetPosition - transform.position);
+        }
+
+        if (remainingDistance <= 0.1f && hoverTimer <= 2.0f)
+        {
+            currentState = DroneState.Hover1;
+            hoverTimer = 0f;
+        }
+
+        // Update LED Blinker settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.isAscending = false;
+            droneControllerLite.isDescending = false;
+        }
+
+        // Update rotor lights settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.ledsAreOn = false;
+        }
+    }
+
+    private void Hover1()
+    {
+        hoverTimer += Time.deltaTime;
+        droneController.Stop();
+        if (hoverTimer >= 2.0f)
+        {
+            currentState = DroneState.Approach2;
+            hoverTimer = 0f;
+        }
+
+        // Update LED Blinker settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.isAscending = false;
+            droneControllerLite.isDescending = false;
+        }
+
+        // Update rotor lights settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.ledsAreOn = false;
+        }
+    }
+
+    private void Approach2()
+    {
+        Vector3 targetPosition = new Vector3(-110.239f, 5f, -107.379f);
+
+        droneController.acceleration = acceleration;
+        droneController.SetMaxSpeed(4.0f);
+
+        // Calculate the remaining distance to the targetHoverPosition.
+        float remainingDistance2 = Vector3.Distance(transform.position, targetPosition);
+
+        if (remainingDistance2 >= 5.0f)
+        {
+            droneController.Accelerate(targetPosition - transform.position);
+        }
+
+        if (remainingDistance2 <= 5.0f && remainingDistance2 > 0.2f)
+        {
+            droneController.Deccelerate(targetPosition - transform.position);
+        }
+
+        if (remainingDistance2 <= 0.2f)
+        {   
+            currentState = DroneState.Hover2;
+        }
+
+        // Update LED Blinker settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.isAscending = false;
+            droneControllerLite.isDescending = false;
+        }
+
+        // Update rotor lights settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.ledsAreOn = false;
+        }
+
+        // Update progress bar display settings
+            if (Interface == 6)
+            {
+                wPackage.SetActive(false);
+                noPackage.SetActive(false);
+                //UpdateProgressBar(false);
+            }
+
+    }
+
+    private void Hover2()
+    {
+        hoverTimer += Time.deltaTime;
+        droneController.Stop();
+
+        if (arrow != null && !arrow.activeSelf)
+        {
+            // Only change Arrow properties if Interface is 1 or 4
+            if (Interface == 1 || Interface == 4)
+            {
+                arrow.SetActive(true);
+                arrowMaterial.SetFloat("_isAnimating", 0); // false
+                arrowMaterial.SetFloat("_pointedUP", 0); // false
+            }
+        }
+
+        if (landingPad != null && !landingPad.activeSelf)
+        {
+            // Only change LandingPad properties if Interface is 3 or 4
+            if (Interface == 3 || Interface == 4)
+            {
+                landingPad.SetActive(true);
+                landingPadMaterial.SetFloat("_showH", 1); // true
+            }
+        }
+
+        if (hoverTimer >= hoverDuration)
+        {
+            currentState = DroneState.Land;
+            hoverTimer = 0.0f;
+            landMoveStartTime = Time.time;
+        }
+
+        // Update LED Blinker settings for Hover2 phase
+        if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+        {
+            droneControllerLite.isDescending = true;
+            droneControllerLite.isAscending = false;
+            droneControllerLite.blinkingSpeed = 0.1f;
+        }
+
+        // Update rotor lights settings
+        if (droneControllerLite != null)
+        {
+            droneControllerLite.ledsAreOn = true;
+        }
+
+            // Update progress bar display settings
+            if (Interface == 6)
+            {
+                wPackage.SetActive(true);
+                noPackage.SetActive(false);
+                //UpdateProgressBar(false);
+            }
+    }
+
+    private void Land()
+    {
+        float elapsedTime = Time.time - landMoveStartTime;
+        float t = Mathf.Clamp01(elapsedTime / landMoveDuration);
+        droneController.acceleration = acceleration;
+        droneController.SetMaxSpeed(0.5f);
+        droneController.Accelerate(targetLandPosition - transform.position);
+
+        if (arrow != null)
+        {
+            // Only change Arrow properties if Interface is 1 or 4
+            if (Interface == 1 || Interface == 4)
+            {
+                arrowMaterial.SetFloat("_isAnimating", 1); // true
+                arrowMaterial.SetFloat("_pointedUP", 0); // false
+            }
+        }
+
+        if (landingPad != null)
+        {
+            // Only change LandingPad properties if Interface is 3 or 4
+            if (Interface == 3 || Interface == 4)
+            {
+                // Increment the timer by the time since the last frame
+                toggleTimer += Time.deltaTime;
+
+                // Toggle _showH every 2 seconds
+                if (toggleTimer >= 0.5f)
+                {
+                    isShowHOn = !isShowHOn; // Toggle the state
+                    landingPadMaterial.SetFloat("_showH", isShowHOn ? 1f : 0f); // Set _showH based on state
+                    toggleTimer = 0f; // Reset the timer
+                }
+            }
+        }
+
+        // Update LED Blinker settings for Land phase
+        if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+        {
+            droneControllerLite.isDescending = true;
+            droneControllerLite.isAscending = false;
+            droneControllerLite.blinkingSpeed = 4.09f;
+        }
+
+        // Adjust LED toggle rate based on `elapsedTime / landMoveDuration`
+        if (droneControllerLite != null && (Interface == 5 || Interface == 4))
+        {
+            // Scale the toggle rate based on `elapsedTime / landMoveDuration` (from 0 to 1)
+            // At 0 -> blink once every 1 second, at 1 -> blink 5 times per second (every 0.2 seconds)
+            float ledToggleFrequency = Mathf.Lerp(0.8f, 0.05f, Mathf.Clamp01(elapsedTime / landMoveDuration));
+            ledToggleTimer += Time.deltaTime;
+
+            // Toggle LEDs based on the calculated frequency
+            if (ledToggleTimer >= ledToggleFrequency)
+            {
+                ledsAreOnState = !ledsAreOnState; // Toggle LED state
+                droneControllerLite.ledsAreOn = ledsAreOnState; // Apply the toggle
+                ledToggleTimer = 0f; // Reset the timer
+            }
+        }
+
+        // Update progress bar display settings
+            if (Interface == 6)
+            {
+                wPackage.SetActive(true);
+                noPackage.SetActive(false);
+                progressBar.FillAmount = Mathf.Clamp01(elapsedTime / landMoveDuration);
+            }
+
+
+        if (t >= 1.0f)
+        {
+            currentState = DroneState.Hover3;
+            t = 0.0f;
+            landMoveStartTime = Time.time;
+        }
+    }
+
+    private void Hover3()
+    {
+        hoverTimer += Time.deltaTime;
+        droneController.Stop();
+
+        if (hoverTimer >= 0.01f && hoverTimer < 1.0f)
+        {
+            if (arrow != null)
+            {
+                // Only change Arrow properties if Interface is 1 or 4
+                if (Interface == 1 || Interface == 4)
+                {
+                    arrowMaterial.SetFloat("_isAnimating", 1); // true
+                    arrowMaterial.SetFloat("_pointedUP", 0); // false
+                }
+            }
+
+            if (landingPad != null)
+            {
+                // Only change LandingPad properties if Interface is 3 or 4
+                if (Interface == 3 || Interface == 4)
+                {
+                    // Increment the timer by the time since the last frame
+                    toggleTimer += Time.deltaTime;
+
+                    // Toggle _showH every 2 seconds
+                    if (toggleTimer >= 0.5f)
+                    {
+                        isShowHOn = !isShowHOn; // Toggle the state
+                        landingPadMaterial.SetFloat("_showH", isShowHOn ? 1f : 0f); // Set _showH based on state
+                        toggleTimer = 0f; // Reset the timer
+                    }
+                }
+            }
+
+            // Update LED Blinker settings for Land phase
+            if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+            {
+                droneControllerLite.isDescending = true;
+                droneControllerLite.isAscending = false;
+                droneControllerLite.blinkingSpeed = 4.09f;
+            } 
+        }
+
+        if (hoverTimer >= 1.0f && hoverTimer < 10.0f)
+        {
+            var rigidBody = Package.GetComponent<Rigidbody>();
+            rigidBody.useGravity = true;
+            rigidBody.isKinematic = false;
+            Package.SetParent(null);
+            Package.transform.SetParent(Scene.transform);
+            
+            if (arrow != null)
+            {
+                // Only change Arrow properties if Interface is 1 or 4
+                if (Interface == 1 || Interface == 4)
+                {
+                    arrowMaterial.SetFloat("_isAnimating", 0); // false
+                    arrowMaterial.SetFloat("_pointedUP", 1); // true
+                }
+            }
+        
+            if (landingPad != null)
+            {
+                // Only change LandingPad properties if Interface is 3 or 4
+                if (Interface == 3 || Interface == 4)
+                {
+                    landingPadMaterial.SetFloat("_showH", 0); // true
+                }
+            }
+            
+            // Update LED Blinker settings for Hover3 phase
+            if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+            {
+                droneControllerLite.isAscending = true;
+                droneControllerLite.isDescending = true;
+                droneControllerLite.blinkingSpeed = 0.01f;
+            }
+
+            // Update rotor lights settings
+            if (droneControllerLite != null && (Interface == 5 || Interface == 4))
+            {
+                droneControllerLite.ledsAreOn = true;
+            }
+
+            // Update progress bar display settings
+            if (Interface == 6)
+            {
+                wPackage.SetActive(false);
+                noPackage.SetActive(true);
+                progressBar.FillAmount = 1.0f;
+            }
+        }
+
+
+        if (hoverTimer >= hoverDuration)
+        {
+            currentState = DroneState.Return;
+            hoverTimer = 0.0f;
+            landMoveStartTime = Time.time;
+        }
+    }
+
+    private void Return()
+    {
+        float elapsedTime = Time.time - landMoveStartTime;
+        float t = Mathf.Clamp01(elapsedTime / landMoveDuration);
+        droneController.acceleration = acceleration;
+        droneController.SetMaxSpeed(0.5f);
+        droneController.Accelerate(targetHoverPosition - transform.position);
+
+        if (arrow != null)
+        {
+            // Only change Arrow properties if Interface is 1 or 4
+            if (Interface == 1 || Interface == 4)
+            {
+                arrowMaterial.SetFloat("_isAnimating", 1); // true
+                arrowMaterial.SetFloat("_pointedUP", 1); // true
+            }
+        }
+
+        if (landingPad != null)
+        {
+            // Only change LandingPad properties if Interface is 3 or 4
+            if (Interface == 3 || Interface == 4)
+            {
+                // Increment the timer by the time since the last frame
+                toggleTimer += Time.deltaTime;
+
+                // Toggle _showH every 2 seconds
+                if (toggleTimer >= 0.5f)
+                {
+                    isShowHOn = !isShowHOn; // Toggle the state
+                    landingPadMaterial.SetFloat("_ring1Radius", isShowHOn ? 1f : 0f); // Set _showH based on state
+                    toggleTimer = 0f; // Reset the timer
+                }
+            }
+        }
+
+        // Adjust LED toggle rate based on `elapsedTime / landMoveDuration`
+        if (droneControllerLite != null && (Interface == 5 || Interface == 4))
+        {
+            // Scale the toggle rate based on `elapsedTime / landMoveDuration` (from 0 to 1)
+            // At 0 -> blink once every 1 second, at 1 -> blink 5 times per second (every 0.2 seconds)
+            float ledToggleFrequency = Mathf.Lerp(0.05f, 0.8f, Mathf.Clamp01(elapsedTime / landMoveDuration));
+            ledToggleTimer += Time.deltaTime;
+
+            // Toggle LEDs based on the calculated frequency
+            if (ledToggleTimer >= ledToggleFrequency)
+            {
+                ledsAreOnState = !ledsAreOnState; // Toggle LED state
+                droneControllerLite.ledsAreOn = ledsAreOnState; // Apply the toggle
+                ledToggleTimer = 0f; // Reset the timer
+            }
+        }
+        
+        // Update progress bar display settings
+        if (Interface == 6)
+        {
+            wPackage.SetActive(false);
+            noPackage.SetActive(true);
+            progressBar.FillAmount = 1 - (Mathf.Clamp01(elapsedTime / landMoveDuration));
+        }
+
+        if (t >= 1.0f)
+        {
+            currentState = DroneState.MoveToFinal;
+        }
+
+        // Update LED Blinker settings for Return phase
+        if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+        {
+            droneControllerLite.isAscending = true;
+            droneControllerLite.isDescending = false;
+            droneControllerLite.blinkingSpeed = 4.09f;
+        }
+    }
+
+    private void MoveToFinal()
+    {
+        Vector3 finalPosition = new Vector3(-110.239f, 15f, -107.379f);
+        float remainingDistance = Vector3.Distance(transform.position, targetHoverPosition);
+
+        // Deactivate arrow and landing pad if needed.
+        if (Interface == 1 || Interface == 4)
+        {
+            arrow.SetActive(false);
+        }
+        if (Interface == 3 || Interface == 4)
+        {
+            landingPad.SetActive(false);
+        }
+
+        // Update LED Blinker settings for final phase
+        if (droneControllerLite != null && (Interface == 2 || Interface == 4))
+        {
+            droneControllerLite.isAscending = false;
+            droneControllerLite.isDescending = false;
+            droneControllerLite.blinkingSpeed = 0.1f; // Adjust blinking speed for final phase
+        }
+
+        // Update rotor lights settings
+        if (droneControllerLite != null && (Interface == 5 || Interface == 4))
+        {
+            droneControllerLite.ledsAreOn = false;
+        }
+
+        // Update progress bar display settings
+        if (Interface == 6)
+        {
+            wPackage.SetActive(false);
+            noPackage.SetActive(false);
+            //pb.SetActive(true);
+        }
+
+        if (remainingDistance <= 5f && remainingDistance > 0.0f)
+        {
+            droneController.acceleration = acceleration;
+            droneController.Accelerate(finalPosition - transform.position);
+            droneController.SetMaxSpeed(4.0f);
+        }
+        else if (remainingDistance > 5f && remainingDistance <= 10f)
+        {
+            droneController.SetMaxSpeed(4.0f);
+        }
+        else
+        {
+            currentState = DroneState.End;
+        }
+    }
+
+    private void End()
+    {
+        droneController.Stop();
+        arrow.SetActive(false);
+        landingPad.SetActive(false);
+    }
+ }

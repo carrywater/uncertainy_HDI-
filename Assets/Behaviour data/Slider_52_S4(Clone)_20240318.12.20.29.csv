@@ -1,0 +1,15 @@
+ID,52,Time,599.0656,DronePosition,-355.2363,45,-107.379,0.1349605,CameraPosition,-103.4009,1.561907,-107.2236,CameraRotation,13.00368,268.2405,356.8346,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.0797,DronePosition,-355.2334,45,-107.379,0.2054885,CameraPosition,-103.401,1.561869,-107.2235,CameraRotation,13.0112,268.2415,356.8436,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.0941,DronePosition,-355.2293,45,-107.379,0.2778815,CameraPosition,-103.4011,1.561821,-107.2234,CameraRotation,13.00452,268.2435,356.8732,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1074,DronePosition,-355.2248,45,-107.379,0.343997,CameraPosition,-103.4012,1.561798,-107.2233,CameraRotation,13.00773,268.2673,356.8872,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1214,DronePosition,-355.219,45,-107.379,0.41442,CameraPosition,-103.4013,1.56178,-107.2232,CameraRotation,12.98826,268.2827,356.8892,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1354,DronePosition,-355.2122,45,-107.379,0.484043,CameraPosition,-103.4013,1.561714,-107.2232,CameraRotation,12.98362,268.3146,356.8824,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1494,DronePosition,-355.2045,45,-107.379,0.5539325,CameraPosition,-103.4013,1.561643,-107.2231,CameraRotation,12.98682,268.3509,356.8911,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1631,DronePosition,-355.1959,45,-107.379,0.622857,CameraPosition,-103.4013,1.56161,-107.223,CameraRotation,13.00397,268.3743,356.8965,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.177,DronePosition,-355.1863,45,-107.379,0.6923225,CameraPosition,-103.4013,1.561567,-107.223,CameraRotation,13.01601,268.3878,356.9104,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.1908,DronePosition,-355.1758,45,-107.379,0.76134,CameraPosition,-103.4012,1.561524,-107.2229,CameraRotation,13.03017,268.4089,356.9288,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.2048,DronePosition,-355.1642,45,-107.379,0.831145,CameraPosition,-103.4012,1.561549,-107.2229,CameraRotation,13.05392,268.4218,356.9382,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.2186,DronePosition,-355.1517,45,-107.379,0.900333,CameraPosition,-103.4013,1.561597,-107.2229,CameraRotation,13.04206,268.4272,356.9497,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.2327,DronePosition,-355.138,45,-107.379,0.9710395,CameraPosition,-103.4013,1.561655,-107.223,CameraRotation,13.03094,268.4347,356.9478,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.2465,DronePosition,-355.1238,45,-107.379,1.039481,CameraPosition,-103.4013,1.561651,-107.223,CameraRotation,13.0013,268.4404,356.9419,CurrentState,MoveToInitial,Slider,17,Scenario,4
+ID,52,Time,599.2605,DronePosition,-355.1082,45,-107.379,1.109788,CameraPosition,-103.4013,1.561639,-107.223,CameraRotation,12.99116,268.4311,356.9339,CurrentState,MoveToInitial,Slider,17,Scenario,4

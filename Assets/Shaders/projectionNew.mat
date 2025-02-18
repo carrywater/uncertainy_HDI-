@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6242557068242349667
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: projectionNew
+  m_Shader: {fileID: -6465566751694194690, guid: ad74f47b03641ec4888baa851ff9d848, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _SampleTexture2D_21091032d64b424c9ee9316e041c45ff_Texture_1:
+        m_Texture: {fileID: 2800000, guid: c5caf04f4d9797d45b728e3e3a0b206e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_21091032d64b424c9ee9316e041c45ff_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: c5caf04f4d9797d45b728e3e3a0b206e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_2c0a6b994f604e2892750fc3454f6ac4_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: c5caf04f4d9797d45b728e3e3a0b206e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _animRingS: 0.2
+    - _animRingSpacing: 0.3
+    - _animRingT: 0.1
+    - _animRingThickness: 0.12
+    - _animSpeed: 1.67
+    - _animatedRingsOn: 0
+    - _innerRadius1: 0.1
+    - _innerRadius2: 0
+    - _masterOpacity: 1
+    - _outerRadius1: 0.1
+    - _outerRadius2: 0
+    - _outwardsAnimation: 0
+    - _ring1L: 1
+    - _ring1Radius: 1
+    - _ring1T: 0.149
+    - _ring1Thickness: 0.15
+    - _ring2L: 0.338
+    - _ring2Radius: 0
+    - _ring2T: 0.128
+    - _ring2Thickness: 0.275
+    - _showH: 1
+    - _sizeH: 3.04
+    m_Colors:
+    - _animRingC: {r: 1, g: 1, b: 1, a: 1}
+    - _animRingColor: {r: 0, g: 1, b: 1, a: 1}
+    - _colorH: {r: 0, g: 1, b: 1, a: 1}
+    - _ring1C: {r: 0, g: 0.19427681, b: 1, a: 1}
+    - _ring1Color: {r: 0, g: 1, b: 1, a: 1}
+    - _ring2C: {r: 0, g: 0.25349808, b: 1, a: 1}
+    - _ring2Color: {r: 0, g: 1, b: 1, a: 1}
+    - _ringColor1: {r: 0, g: 0, b: 0, a: 0}
+    - _ringColor2: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
